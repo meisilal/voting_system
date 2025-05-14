@@ -1,4 +1,23 @@
+# Virtual environment
 venv/
-__pycache__/
+env/
+
+# Python cache files
 *.pyc
-database.db
+*.pyo
+*.pyd
+
+# Firebase credentials
+instance/firebase_config.json
+instance/firebase_key.json
+
+# Environment config
+.env
+
+# Editor settings (optional but recommended)
+.vscode/
+.idea/
+
+# OS system files
+.DS_Store
+Thumbs.db

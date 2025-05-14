@@ -1,9 +1,15 @@
-from flask import Flask
+from flask import  Flask
+from config import Config
+from firebase_admin import credentials, initialize_app
+from routes.voter_routes import voter_bp
+
 app = Flask(__name__)
+app.config.fom_object(Config)
 
-@app.route('/')
-def home():
-    return "Welcome to the Voting System"
+cred = credentials.Certificate("firebase_key.json")
+initialize_app(cred)
 
-if __name__ == '__main__':
+app.register_blueprint(voter_bp)
+
+if __name__ == "__main__":
     app.run(debug=True)
