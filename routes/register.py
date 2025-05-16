@@ -20,7 +20,7 @@ def handle_registration():
                 password=password,
                 display_name=name
             )
-            #Save additional voter data (e.g., ID number) to Firestore
+            #Save additional voter data to Firestore
             data = {
                 "uid": user.uid,
                 "name": name,

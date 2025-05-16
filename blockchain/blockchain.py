@@ -1,26 +1,23 @@
 import hashlib
 import time
 
-class Block:
-    def __init__(self, index, data, previous_hash):
-        self.timestamp = time.time()
-        self.index = index
-        self.data = data
-        self.previous_hash = previous_hash
-        self.hash = self.calculate_hash()
+blockchain = []
 
-    def calculate_hash(self):
-        record = f'{self.index}{self.timestamp}{self.data}{self.previous_hash}'
-        return hashlib.sha256(record.encode()).hexdigest()
-    
-class Blockchain:
-    def __init__(self):
-        self.chain = [self.create_genesis_block()]
+def create_block(data):
+    previous_hash = blockchain[-1]['hash'] if blockchain else '0'
+    block = {
+        'index': len(blockchain) + 1,
+        'timestamp': time.time(),
+        'data': data,
+        'previous_hash': previous_hash,
+    }
+    block_string = f"{block['index']}{block['timestamp']}{block['data']}{previous_hash}"
+    block['hash'] = hashlib.sha256(block_string.encode()).hexdigest()
+    blockchain.append(block)
+    return block
 
-    def create_genesis_block(self):
-        return Block(0, "Genesis Block", "0")
-    
-    def add_block(self, data):
-        previous_block = self.chain[-1]
-        new_block = Block(len(self.chain), data, previous_block.hash)
-        self.chain.append(new_block)
+def add_vote_to_chain(voter_uid, vote):
+    # data includes voter_uid for traceability
+    data = {'voter_uid': voter_uid, 'vote': vote}
+    create_block(data)
+    return True

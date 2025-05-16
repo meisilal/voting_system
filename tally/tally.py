@@ -1,9 +1,9 @@
-from collections import defaultdict
-from blockchain.blockchain import vote_chain
+from blockchain.blockchain import blockchain
 
 def tally_votes():
-    results = defaultdict(int)
-    for block in vote_chain.chain[1:]: #Skips genesis block
-        candidate = block.data["candidate"]
-        results[candidate] += 1
-    return dict(results)
+    results = {}
+    for block in blockchain:
+        vote = block['data'].get('vote')
+        if vote:
+            results[vote] = results.get(vote, 0) + 1
+    return results
