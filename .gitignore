@@ -3,12 +3,12 @@ venv/
 env/
 
 # Python cache files
+__pycache__/
 *.pyc
 *.pyo
 *.pyd
 
 # Firebase credentials
-instance/firebase_config.json
 instance/firebase_key.json
 
 # Environment config

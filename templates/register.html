@@ -7,9 +7,11 @@
 
 <body>
     <h2>Voter Registration</h2>
-    <form method="post">
-        Name: <input type="text" name="name"><br>
-        ID Number: <input type="text" name="id_number"><br>
+    <form method="POST" action="/register">
+        <input type="text" name="name" placeholder="Full Name" required />
+        <input type="text" name="id_number" placeholder="ID Number" required />
+        <input type="email" name="email" placeholder="Email" required />
+        <input type="password" name="password" placeholder="Password" required />>
         <button type="submit">Register</button>
     </form>
 </body>
