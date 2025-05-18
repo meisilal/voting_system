@@ -1,16 +1,19 @@
-import firebase_admin
-from firebase_admin import firestore
-from firebase_config.firebase_config import db
-
-db = firestore.client()
+from firebase_config import db
 
 def register_voter(data):
-    #data = {"uid": uid, "name": name,"id_number": id_number, "email": email}
-    voters_ref = db.collection('voters')
-    voters_ref.document(data['uid']).set(data)
+    try:
+        db.collection('voters').document(data['uid']).set(data)
+    except Exception as e:
+        print(f"Error registering voter: {e}")
 
 def get_voter(uid):
-    voter_doc = db.collection('voters').document(uid).get()
-    if voter_doc.exists:
-        return voter_doc.to_dict()
-    return None
+    try:
+        doc_ref = db.collection("voters").document(uid)
+        doc = doc_ref.get()
+        if doc.exists:
+            return doc.to_dict()
+        else:
+            return None
+    except Exception as e:
+        print(f"Error fetching voter data: {e}")
+        return None

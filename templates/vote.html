@@ -1,3 +1,4 @@
+<!-- templates/vote.html -->
 <!DOCTYPE html>
 <html>
 
@@ -6,10 +7,15 @@
 </head>
 
 <body>
-    <h2>Cast Your Vote</h2>
-    <form method="POST" action="/vote">
-        <input name="vote" placeholder="Your Vote" required><br>
-        <button type="submit">Vote</button>
+    <h1>Cast Your Vote</h1>
+    <form method="POST">
+        <label for="election_id">Election ID (optional):</label><br>
+        <input type="text" name="election_id" id="election_id"><br><br>
+
+        <label for="vote">Your Vote:</label><br>
+        <input type="text" name="vote" id="vote" required><br><br>
+
+        <button type="submit">Submit Vote</button>
     </form>
 </body>
 

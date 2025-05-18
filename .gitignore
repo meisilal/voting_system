@@ -1,15 +1,12 @@
 # Virtual environment
 venv/
-env/
 
 # Python cache files
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
 
 # Firebase credentials
-instance/firebase_key.json
+firebase_key.json
 
 # Environment config
 .env
@@ -21,3 +18,5 @@ instance/firebase_key.json
 # OS system files
 .DS_Store
 Thumbs.db
+
+database.db
