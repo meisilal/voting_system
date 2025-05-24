@@ -11,7 +11,14 @@
         <div>
             <h5 class="mb-1">{{ election.title }}</h5>
             <small>Type: {{ election.type }}</small><br>
-            <small>Start: {{ election.start_date }} | End: {{ election.end_date }}</small>
+            <small>Start: {{ election.start_date }} | End: {{ election.end_date }}</small><br>
+            <small>Status:
+                {% if election.status == 'closed' %}
+                <span class="badge bg-danger">{{ election.status|capitalize }}</span>
+                {% else %}
+                <span class="badge bg-success">{{ election.status|capitalize }}</span>
+                {% endif %}
+            </small>
         </div>
         <span class="badge bg-primary rounded-pill">{{ election.positions | length }} Positions</span>
     </a>

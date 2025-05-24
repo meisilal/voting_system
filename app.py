@@ -10,6 +10,7 @@ from tally.tally import tally_bp
 from auth.auth import auth_bp
 from elections.elections import elections_bp
 from routes.home import home_bp
+from admin.admin_elections import admin_elections_bp
 
 # Import firebase db to ensure it's initialized once
 from firebase_config import db  
@@ -27,6 +28,7 @@ def create_app():
     app.register_blueprint(tally_bp, url_prefix='/tally')
     app.register_blueprint(elections_bp, url_prefix='/elections')
     app.register_blueprint(home_bp)
+    app.register_blueprint(admin_elections_bp)
 
     # Make `now` globally available in all templates
     @app.context_processor

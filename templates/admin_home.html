@@ -33,5 +33,16 @@
             </div>
         </div>
     </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Manage Elections</h5>
+                <p class="card-text">End ongoing elections or delete old elections.</p>
+                <a href="{{ url_for('admin_elections.list_admin_elections') }}" class="btn btn-warning">Manage
+                    Elections</a>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

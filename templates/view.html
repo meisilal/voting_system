@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1 class="mb-4">{{ election.title }}</h1>
+
+<div class="mb-3">
+    <p><strong>Type:</strong> {{ election.type }}</p>
+    <p><strong>Start Date:</strong> {{ election.start_date }}</p>
+    <p><strong>End Date:</strong> {{ election.end_date }}</p>
+    <p><strong>Status:</strong>
+        {% if election.status == 'closed' %}
+        <span class="badge bg-danger">{{ election.status|capitalize }}</span>
+        {% else %}
+        <span class="badge bg-success">{{ election.status|capitalize }}</span>
+        {% endif %}
+    </p>
+</div>
+
+<h3>Positions & Candidates</h3>
+<div class="accordion" id="positionsAccordion">
+    {% for pos in election.positions %}
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="heading{{ loop.index }}">
+            <button class="accordion-button {{ 'collapsed' if not loop.first }}" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapse{{ loop.index }}" aria-expanded="{{ 'true' if loop.first else 'false' }}"
+                aria-controls="collapse{{ loop.index }}">
+                {{ pos.name }}
+            </button>
+        </h2>
+        <div id="collapse{{ loop.index }}" class="accordion-collapse collapse {{ 'show' if loop.first }}"
+            aria-labelledby="heading{{ loop.index }}" data-bs-parent="#positionsAccordion">
+            <div class="accordion-body">
+                <ul class="list-group">
+                    {% for candidate in pos.candidates %}
+                    <li class="list-group-item">{{ candidate }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<a href="{{ url_for('election.list_elections') }}" class="btn btn-secondary mt-4">Back to Elections</a>
+{% endblock %}

@@ -1,7 +1,8 @@
 import hashlib
 import time
-from flask import Blueprint, request, redirect, flash, session, render_template
+from flask import Blueprint, request, redirect, flash, session, render_template, url_for
 from firebase_config import db
+from elections.verify_external import is_voter_eligible
 
 vote_bp = Blueprint('vote', __name__)
 
@@ -22,14 +23,11 @@ def create_block(data):
     return block
 
 def has_already_voted(voter_uid, election_id):
-    """
-    Checks if the voter has already voted in the given election.
-    """
     votes = db.collection("votes") \
               .where("voter_uid", "==", voter_uid) \
               .where("election_id", "==", election_id) \
               .stream()
-    return any(votes)  # True if any vote documents exist
+    return any(votes)
 
 def add_vote_to_chain(voter_uid, election_id, vote_data):
     full_vote_data = {
@@ -40,10 +38,8 @@ def add_vote_to_chain(voter_uid, election_id, vote_data):
         'timestamp': time.time()
     }
 
-    # Blockchain block
     block = create_block(full_vote_data)
 
-    # Firebase write
     db.collection("votes").add({
         **full_vote_data,
         "block_hash": block['hash'],
@@ -51,56 +47,69 @@ def add_vote_to_chain(voter_uid, election_id, vote_data):
     })
     return True
 
-@vote_bp.route('/vote', methods=['GET', 'POST'])
+@vote_bp.route('/', methods=['GET', 'POST'])
 def cast_vote():
     if 'user' not in session:
         flash("Please login first.", "warning")
-        return redirect("/auth/login")  # Adjusted to your auth login route
+        return redirect("/auth/login")
 
     if request.method == "POST":
         try:
             voter_uid = session['user']
-            election_id = request.form.get('election_id')
+            election_id = request.form.get("election_id")
 
             if not election_id:
-                flash("Please select an election.", "danger")
-                return redirect("/vote")
+                flash("Election ID is missing.", "danger")
+                return redirect(url_for("vote.cast_vote"))
 
-            # Get election document directly by ID
             election_doc = db.collection('elections').document(election_id).get()
             if not election_doc.exists:
                 flash("Selected election not found.", "danger")
-                return redirect("/vote")
+                return redirect(url_for("vote.cast_vote"))
 
             selected_election = election_doc.to_dict()
 
+            # Check if election is closed
+            if selected_election.get("status") == "closed":
+                flash("This election has already ended and is no longer accepting votes.", "danger")
+                return redirect(url_for("vote.cast_vote"))
+
+            # === New: Check voter eligibility ===
+            if not is_voter_eligible(election_id, voter_uid):
+                flash("You are not eligible to vote in this election.", "danger")
+                return redirect(url_for("vote.cast_vote"))
+
             if has_already_voted(voter_uid, election_id):
                 flash("You have already voted in this election.", "danger")
-                return redirect("/vote")
+                return redirect(url_for("vote.cast_vote"))
 
-            # Collect votes for all positions
             for position in selected_election.get('positions', []):
-                position_name = position['name'].replace(" ", "_")
-                vote_key = f"vote_{election_id}_{position_name}"
-                candidate = request.form.get(vote_key)
+                position_key = f"vote_{election_id}_{position['name'].replace(' ', '_')}"
+                candidate = request.form.get(position_key)
 
                 if not candidate:
-                    flash(f"Missing vote for position {position['name']}.", "danger")
-                    return redirect("/vote")
+                    flash(f"Missing vote for {position['name']}.", "danger")
+                    return redirect(url_for("vote.cast_vote"))
 
                 add_vote_to_chain(voter_uid, election_id, {
                     "position": position['name'],
                     "candidate": candidate
                 })
 
-            flash("All votes cast successfully.", "success")
-            return redirect("/vote")
+            flash("Your vote has been submitted successfully!", "success")
+            return redirect(url_for("vote.cast_vote"))
 
         except Exception as e:
-            flash(f"Error submitting vote: {str(e)}", "danger")
-            return redirect("/vote")
+            flash(f"An error occurred: {str(e)}", "danger")
+            return redirect(url_for("vote.cast_vote"))
 
-    # GET request - list all elections
-    elections = db.collection('elections').stream()
-    election_list = [doc.to_dict() for doc in elections]
-    return render_template("vote.html", elections=election_list)
+    # GET request: fetch and render elections that are not closed
+    election_docs = db.collection('elections').stream()
+    elections = []
+    for doc in election_docs:
+        data = doc.to_dict()
+        if data.get("status") != "closed":
+            data['election_id'] = doc.id
+            elections.append(data)
+
+    return render_template("vote.html", elections=elections)

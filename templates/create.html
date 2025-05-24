@@ -2,7 +2,7 @@
 
 {% block content %}
 <h2 class="mb-4">Create New Election</h2>
-<form method="POST" id="electionForm">
+<form method="POST" enctype="multipart/form-data" id="electionForm">
     <div class="mb-3">
         <input type="text" name="title" placeholder="Election Title" required class="form-control">
     </div>
@@ -46,6 +46,13 @@
 
     <button type="button" class="btn btn-secondary mb-3" onclick="addPosition()">+ Add Another Position</button>
     <br>
+
+    <div class="mb-3">
+        <label for="voter_file" class="form-label">Upload Eligible Voters CSV</label>
+        <input class="form-control" type="file" id="voter_file" name="voter_file" accept=".csv">
+        <small class="form-text text-muted">CSV must contain a column named <code>email</code>.</small>
+    </div>
+
     <button type="submit" class="btn btn-primary">Create Election</button>
 </form>
 

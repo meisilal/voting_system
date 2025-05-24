@@ -27,11 +27,8 @@ def login():
 
             flash("Login successful.", "success")
 
-            # Redirect based on role
-            if role == "admin":
-                return redirect("/home")
-            else:
-                return redirect("/home")
+            # Redirect based on role (currently same for both, but can be customized)
+            return redirect("/home")
 
         except Exception as e:
             flash(f"Authentication failed: {str(e)}", "danger")
