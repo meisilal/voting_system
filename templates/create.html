@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2 class="mb-4">Create New Election</h2>
+<form method="POST" id="electionForm">
+    <div class="mb-3">
+        <input type="text" name="title" placeholder="Election Title" required class="form-control">
+    </div>
+    <div class="mb-3">
+        <input type="text" name="type" placeholder="Election Type" required class="form-control">
+    </div>
+    <div class="mb-3">
+        <label for="start_date" class="form-label">Start Date</label>
+        <input type="date" name="start_date" required class="form-control" id="start_date">
+    </div>
+    <div class="mb-3">
+        <label for="end_date" class="form-label">End Date</label>
+        <input type="date" name="end_date" required class="form-control" id="end_date">
+    </div>
+
+    <input type="hidden" name="total_positions" id="total_positions" value="2">
+
+    <div id="positions">
+        <div class="position-block">
+            <h5>Position 1</h5>
+            <div class="mb-3">
+                <input type="text" name="position_1" placeholder="Position Name" required class="form-control">
+            </div>
+            <div class="mb-3">
+                <input type="text" name="candidates_1" placeholder="Candidates (comma-separated)" required
+                    class="form-control">
+            </div>
+        </div>
+
+        <div class="position-block">
+            <h5>Position 2</h5>
+            <div class="mb-3">
+                <input type="text" name="position_2" placeholder="Position Name" required class="form-control">
+            </div>
+            <div class="mb-3">
+                <input type="text" name="candidates_2" placeholder="Candidates (comma-separated)" required
+                    class="form-control">
+            </div>
+        </div>
+    </div>
+
+    <button type="button" class="btn btn-secondary mb-3" onclick="addPosition()">+ Add Another Position</button>
+    <br>
+    <button type="submit" class="btn btn-primary">Create Election</button>
+</form>
+
+<script>
+    let positionCount = 2;
+
+    function addPosition() {
+        positionCount++;
+        const positionsDiv = document.getElementById('positions');
+
+        const positionBlock = document.createElement('div');
+        positionBlock.classList.add('position-block');
+
+        positionBlock.innerHTML = `
+            <h5>Position ${positionCount}</h5>
+            <div class="mb-3">
+                <input type="text" name="position_${positionCount}" placeholder="Position Name" required class="form-control">
+            </div>
+            <div class="mb-3">
+                <input type="text" name="candidates_${positionCount}" placeholder="Candidates (comma-separated)" required class="form-control">
+            </div>
+        `;
+
+        positionsDiv.appendChild(positionBlock);
+
+        document.getElementById('total_positions').value = positionCount;
+    }
+</script>
+{% endblock %}

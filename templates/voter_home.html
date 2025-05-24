@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1 class="mb-4">Welcome, Voter!</h1>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Vote Now</h5>
+                <p class="card-text">Participate in active elections and cast your vote securely.</p>
+                <a href="{{ url_for('vote.cast_vote') }}" class="btn btn-success">Go to Vote</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">View Results</h5>
+                <p class="card-text">See current tallies and election results.</p>
+                <a href="{{ url_for('tally.tally_votes') }}" class="btn btn-info">View Tally</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

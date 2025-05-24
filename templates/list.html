@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2 class="mb-4">Elections</h2>
+
+{% if elections %}
+<div class="list-group">
+    {% for election in elections %}
+    <a href="{{ url_for('election.view_election', election_id=election.election_id) }}"
+        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="mb-1">{{ election.title }}</h5>
+            <small>Type: {{ election.type }}</small><br>
+            <small>Start: {{ election.start_date }} | End: {{ election.end_date }}</small>
+        </div>
+        <span class="badge bg-primary rounded-pill">{{ election.positions | length }} Positions</span>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    No elections found.
+</div>
+{% endif %}
+
+<div class="mt-4">
+    <a href="{{ url_for('election.create_election') }}" class="btn btn-success">Create New Election</a>
+</div>
+{% endblock %}

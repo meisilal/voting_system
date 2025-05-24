@@ -1,22 +1,73 @@
-<!-- templates/vote.html -->
-<!DOCTYPE html>
-<html>
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">Cast Your Vote</h3>
 
-<head>
-    <title>Cast Vote</title>
-</head>
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
 
-<body>
-    <h1>Cast Your Vote</h1>
-    <form method="POST">
-        <label for="election_id">Election ID (optional):</label><br>
-        <input type="text" name="election_id" id="election_id"><br><br>
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="election_id" class="form-label">Select Election</label>
+                            <select class="form-select" id="election_id" name="election_id" required>
+                                <option value="" disabled selected>Choose an election</option>
+                                {% for election in elections %}
+                                <option value="{{ loop.index0 }}">{{ election.title }} ({{ election.type }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
-        <label for="vote">Your Vote:</label><br>
-        <input type="text" name="vote" id="vote" required><br><br>
+                        {% for election in elections %}
+                        <div class="election-positions d-none" data-index="{{ loop.index0 }}">
+                            <input type="hidden" name="election_uid_{{ loop.index0 }}"
+                                value="{{ election.election_id }}">
+                            {% for position in election.positions %}
+                            <div class="mb-3">
+                                <label class="form-label">{{ position.name }}</label>
+                                <select class="form-select"
+                                    name="vote_{{ election.election_id }}_{{ position.name | replace(' ', '_') }}"
+                                    required>
+                                    <option value="" disabled selected>Select a candidate</option>
+                                    {% for candidate in position.candidates %}
+                                    <option value="{{ candidate }}">{{ candidate }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
 
-        <button type="submit">Submit Vote</button>
-    </form>
-</body>
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary">Submit Vote</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-</html>
+<script>
+    const electionSelect = document.getElementById('election_id');
+    const positionSections = document.querySelectorAll('.election-positions');
+
+    electionSelect.addEventListener('change', function () {
+        positionSections.forEach(div => div.classList.add('d-none'));
+        const selectedIndex = this.value;
+        const targetDiv = document.querySelector(`.election-positions[data-index="${selectedIndex}"]`);
+        if (targetDiv) targetDiv.classList.remove('d-none');
+    });
+</script>
+{% endblock %}

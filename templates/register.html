@@ -1,19 +1,84 @@
-<!DOCTYPE html>
-<html>
+{% extends "layout.html" %}
 
-<head>
-    <title>Register</title>
-</head>
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">User Registration</h3>
 
-<body>
-    <h2>Voter Registration</h2>
-    <form method="POST" action="/register">
-        <input type="text" name="name" placeholder="Full Name" required />
-        <input type="text" name="id_number" placeholder="ID Number" required />
-        <input type="email" name="email" placeholder="Email" required />
-        <input type="password" name="password" placeholder="Password" required />>
-        <button type="submit">Register</button>
-    </form>
-</body>
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show"
+                        role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
 
-</html>
+                    <form method="POST" action="/register" id="register-form">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" name="name" id="name" class="form-control"
+                                placeholder="Enter your full name" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_number" class="form-label">ID Number</label>
+                            <input type="text" name="id_number" id="id_number" class="form-control"
+                                placeholder="Enter your ID number" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" name="email" id="email" class="form-control"
+                                placeholder="Enter your email" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" name="password" id="password" class="form-control"
+                                placeholder="Enter a secure password" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Register As</label>
+                            <select name="role" id="role" class="form-select" required
+                                onchange="toggleAdminCodeField()">
+                                <option value="voter" selected>Voter</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 d-none" id="admin-code-container">
+                            <label for="admin_code" class="form-label">Admin Access Code</label>
+                            <input type="text" name="admin_code" id="admin_code" class="form-control"
+                                placeholder="Enter the admin access code" />
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success">Register</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleAdminCodeField() {
+        const role = document.getElementById('role').value;
+        const adminCodeContainer = document.getElementById('admin-code-container');
+        if (role === 'admin') {
+            adminCodeContainer.classList.remove('d-none');
+            document.getElementById('admin_code').required = true;
+        } else {
+            adminCodeContainer.classList.add('d-none');
+            document.getElementById('admin_code').required = false;
+        }
+    }
+
+    // Run on page load in case the form re-renders with "admin" selected
+    document.addEventListener("DOMContentLoaded", toggleAdminCodeField);
+</script>
+{% endblock %}

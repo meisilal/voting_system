@@ -1,6 +1,6 @@
 from firebase_config import db
 
-def check_voter_eligibility(uid, election_id):
+def check_eligibility(uid, election_id):
     try:
         # Check if voter exists
         voter_doc = db.collection('voters').document(uid).get()

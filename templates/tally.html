@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">Tally Votes</h3>
+
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" class="mb-4">
+                        <div class="mb-3">
+                            <label for="election_id" class="form-label">Select Election</label>
+                            <select name="election_id" id="election_id" class="form-select" required>
+                                <option value="" disabled selected>Choose an election</option>
+                                {% for election in election_options %}
+                                <option value="{{ election.election_id }}" {% if election.election_id==election_id
+                                    %}selected{% endif %}>
+                                    {{ election.title }} ({{ election.election_id }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Get Tally</button>
+                        </div>
+                    </form>
+
+                    {% if tally %}
+                    <h5 class="mt-4">Tally Results for Election ID: <strong>{{ election_id }}</strong></h5>
+                    {% for position, results in tally.items() %}
+                    <div class="mt-4">
+                        <h6>{{ position }}</h6>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Candidate</th>
+                                    <th>Votes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for candidate, votes in results.items() %}
+                                <tr>
+                                    <td>{{ candidate }}</td>
+                                    <td>{{ votes }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endfor %}
+                    {% elif tally is not none %}
+                    <div class="alert alert-info mt-4">
+                        No votes found for the selected election.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

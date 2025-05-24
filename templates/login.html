@@ -1,17 +1,97 @@
-<!DOCTYPE html>
-<html>
+{% extends "layout.html" %}
 
-<head>
-    <title>Login</title>
-</head>
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">Login</h3>
 
-<body>
-    <h2>Login</h2>
-    <form method="POST" action="/login">
-        <input type="email" name="email" placeholder="Email" required><br>
-        <input type="password" name="password" placeholder="Password" required><br>
-        <button type="submit">Login</button>
-    </form>
-</body>
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
 
-</html>
+                    <form id="login-form">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" required placeholder="Enter your email">
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" required
+                                placeholder="Enter your password">
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Login</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Firebase App (the core Firebase SDK) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<!-- Firebase Authentication -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAoFy_6U0y8UQ0sn-Cbyu-qOTvWvzfOofg",
+        authDomain: "votingsystem-d8c1c.firebaseapp.com",
+        projectId: "votingsystem-d8c1c",
+        storageBucket: "votingsystem-d8c1c.firebasestorage.app",
+        messagingSenderId: "927166887837",
+        appId: "1:927166887837:web:a3b4bb0c81ea26ebd1e174",
+        measurementId: "G-VY83V0QFWB"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    const auth = firebase.auth();
+
+    document.getElementById('login-form').addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+
+        try {
+            // Sign in user with Firebase Auth
+            const userCredential = await auth.signInWithEmailAndPassword(email, password);
+            const idToken = await userCredential.user.getIdToken();
+
+            // Send ID token to backend for verification
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `id_token=${idToken}`
+            });
+
+            if (response.redirected) {
+                window.location.href = response.url;  // Redirect on successful login
+            } else {
+                const text = await response.text();
+                alert("Login failed: " + text);
+            }
+
+        } catch (error) {
+            alert("Login failed: " + error.message);
+        }
+    });
+</script>
+{% endblock %}
